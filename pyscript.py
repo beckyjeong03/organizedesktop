@@ -1,18 +1,32 @@
 import os
 import shutil
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+
+def main():
+    path = '/mnt/c/Users/becky/Downloads'
+    files = os.listdir(path)
     
     
-path = input("Enter Path: ")
-files = os.listdir(path)
 
-for file in files:
-    filename,extension = os.path.splitext(file)
-    extension = extension[1:]
+    for file in files:
+        file_path = os.path.join(path, file)
+        if os.path.isfile(file_path):
+            filename, extension = os.path.splitext(file)
+            extension = extension[1:]  
 
-    if os.path.exists(path+'/'+extension):
-        shutil.move(path+'/'+file, path+'/'+extension+'/'+file)
-    else:
-        os.makedirs(path+'/'+extension)
-        shutil.move(path+'/'+file, path+'/'+extension+'/'+file)
+            if not os.path.exists(path + '/' + extension):
+                os.makedirs(path + '/' + extension)
+
+            new_file_path = os.path.join(path, extension, file)
+            
+            if os.path.exists(new_file_path):
+                base_filename = filename
+                counter = 1
+                while os.path.exists(os.path.join(path, extension, f"{base_filename}_{counter}{extension}")):
+                    counter += 1
+                new_file_path = os.path.join(path, extension, f"{base_filename}_{counter}{extension}")
+            
+            shutil.move(os.path.join(path, file), new_file_path)
+            print(f"Moved '{file}' to '{new_file_path}'")
+
+if __name__ == "__main__":
+    main()
